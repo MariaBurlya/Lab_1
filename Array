@@ -21,7 +21,7 @@ struct Array {
     int MGET(int index) { // получение элемента по индексу
         if (index < 0 || index > M.size()) {
             cout << "Индекс вне диапазона" << endl;
-            return;
+            return 0;
         }
         return M[index];
     }
