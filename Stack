@@ -1,0 +1,82 @@
+#include <iostream>
+#include <stack>
+#include <vector>
+
+using namespace std;
+
+class Stack { // класс для работы со стеком
+    private: 
+    stack<int> s;
+    public:
+
+    void SPUSH(int value) { // добавление элементов в стек
+        s.push(value);
+    }
+
+    void SPOP() { // удаление элемента из стека
+        if (s.empty()) {
+            cout << "Стек пуст" << endl;
+            return;
+        }
+        s.pop(); // удаление верхнего элемента
+    }
+
+    void SGET() { // чтение стека
+        if (s.empty()) {
+            cout << "Стек пуст" << endl;
+            return;
+        }
+        cout << "" << s.top() << endl; // вывод верхнего элемента
+    }
+
+    void PRINT() { // вывод всех элементов
+        if (s.empty()) {
+            cout << "Стек пуст" << endl;
+            return;
+        }
+        vector<int> temp; // временный вектор для хранения элементов
+        while (!s.empty()) {
+            temp.push_back(s.top()); // сохранение элемента в вектор
+            s.pop(); // удаление элемента из стека
+        }
+        cout << " ";
+        for (int i = temp.size() - 1; i >= 0; i--) { // вывод элементов в порядке добавления
+            cout << temp[i] << " ";
+            s.push(temp[i]); // возвращение элементов обратно в стек
+        }
+        cout << endl;
+
+    }
+};
+
+int main() {
+    Stack stack;
+    string command;
+    int value;
+
+    while (true) {
+        cout << "Введите команду SPUSH, SPOP, SGET, PRINT, EXIT: ";
+        getline(cin, command);
+
+        if (command.substr(0, 5) == "SPUSH") {
+            sscanf(command.c_str(), "SPUSH %d", &value);
+            stack.SPUSH(value);
+        }
+        else if (command == "SPOP") {
+            stack.SPOP();
+        }
+        else if (command == "SGET") {
+            stack.SGET();
+        }
+        else if (command == "PRINT") {
+            stack.PRINT();
+        }
+        else if (command == "EXIT") {
+            break;
+        }
+        else {
+            cout << "Неизвестная команда" << endl;
+        }
+    }
+    return 0;
+}
