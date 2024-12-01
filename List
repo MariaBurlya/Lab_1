@@ -1,0 +1,314 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+struct List{ // узел односвязного списка
+    int data; // данные узла
+    List* next; // указатель на следующий узел
+
+    List(int value): data(value), next(nullptr) {} // конструктор узла
+};
+
+class SingleList { // односвязный список
+    private:
+    List* head; //указатель на голову списка
+    public:
+    SingleList():head(nullptr){} // конструктор списка
+
+    void LPUSH_FRONT(int value){ // добавление в голову
+        List* new_list = new List(value); // создание нового узла
+        new_list->next = head; // новый узел указывает на текущую голову
+        head = new_list; // обновление головы на новый узел
+    }
+
+    void LPUSH_BACK(int value){ // добавление в хвост
+        List* new_list = new List(value); // создание нового узла
+        if (!head) { // если список пуст новый узел становится головой
+            head = new_list;
+            return;
+        }
+        List* temp = head; 
+        while (temp->next) { // ищем последний узел 
+            temp = temp->next;
+        }
+        temp->next = new_list; // добавка нового узла в конец
+    }
+
+    void LDEL_FRONT() { // удаление элемента в голове
+        if (!head) {
+            cout << "Список пуст" << endl;
+            return;
+        }
+        List* temp = head; // сохранение текущей головы
+        head = head->next; // обновление голову на след.узел
+        delete temp; // удаление старой головы
+    }
+
+    void LDEL_BACK() {
+        if (!head) {
+            cout << "Список пуст" << endl;
+            return;
+        }
+        if (!head->next) { // если в списке один узел
+            delete head; // удаление головы
+            head = nullptr; // обновление головы на nullptr 
+            return;
+        }
+        List* temp = head; 
+        while (temp->next->next){ // поиск предпоследнего узла
+            temp = temp->next;
+        }
+        delete temp->next; // удаляем последний узел
+        temp->next = nullptr; // установка указателя на nullptr 
+    }
+
+    void LDEL(int value) {
+        if (!head) {
+            cout << "Список пуст" << endl;
+            return;
+        }
+        if (head->data == value) { // если значение в голове
+            LDEL_FRONT();
+            return;
+        }
+        List* temp = head; 
+        while (temp->next && temp->next->data != value){ // поиск узла с данным значением
+            temp = temp->next;
+        }
+        if (temp->next) { 
+            List* to_delete = temp->next; // узел для удаления
+            temp->next = temp->next->next; // удаление узла из списка
+            delete to_delete; //очищаем память
+        }
+        else {
+            cout << "Элемент не найден" << endl;
+        }
+    }
+
+    bool LGET(int value) {
+        List* temp = head;
+        while (temp) {
+            if (temp->data == value) {
+                return true;
+            }
+            temp = temp->next;
+        }
+        return false;
+    }
+
+    void PRINT() {
+        List* temp = head;
+        while(temp) {
+            cout << temp->data << "";
+            temp = temp->next;
+        }
+        cout << endl;
+    }
+};
+
+struct DList { // узел двусвязного списка
+    int data; // данные узла
+    DList* next; // указатель на след.узел
+    DList* prev; // указатель на пред.узел
+    // конструктор узла
+    DList(int value):data(value), next(nullptr), prev(nullptr) {}
+};
+
+class DoubleList {
+    private:
+    DList* head; // указатель на голову
+    public:
+    DoubleList():head(nullptr){} // конструктор списка
+
+    void LPUSH_DFRONT(int value) { // добавление элемента в голову
+        DList* new_list = new DList(value); // создание нового узла
+        new_list->next = head; // новый узел указывает на текущую голову
+        if (head) {
+            head->prev = new_list; // установка указателя на пред.узел
+        }
+        head = new_list; // обновление головы на новый узел
+    }
+
+    void LPUSH_DBACK(int value) { // добавление элемента в хвост
+        DList* new_list = new DList(value); // создание нового узла
+        if (!head) { 
+            head = new_list; // новый узел становится головой
+            return;
+        }
+        DList* temp = head; 
+        while (temp->next) { // поиск последнего узла
+            temp = temp->next;
+        }
+        temp->next = new_list; // добавка нового узла в хвост
+        new_list->prev = temp; // установка указателя на пред.узел
+    }
+
+    void LDEL_DFRONT() {
+        if (!head) { 
+            cout << "Список пуст" << endl;
+            return;
+        }
+        DList* temp = head; // сохранение текущей головы
+        head = head->next; // обновление головы на след.узел
+        if (head) {
+            head->prev = nullptr; // установка указателя на пред.узел для новогой головы
+        }
+        delete temp; // удаление старой головы
+    }
+
+    void LDEL_DBACK() {
+        if (!head) { 
+            cout << "Список пуст" << endl;
+            return;
+        }
+        if (!head->next) { // в списке только 1 узел
+            delete head; // удаление головы
+            head = nullptr; // обновление головы
+            return;
+        }
+        DList* temp = head; 
+        while (temp->next) { // поиск последнего узла
+            temp = temp->next;
+        }
+        temp->prev->next = nullptr; // удаляем последний узел
+        delete temp; // освобождаем память
+    }
+
+    void LDEL_D(int value) {
+        if (!head) {
+            cout << "Список пуст" << endl;
+            return;
+        }
+        if (head->data == value) { // элемент в голове
+            LDEL_DFRONT();
+            return;
+        }
+        DList* temp = head;
+        while (temp && temp->data != value) { // поиск узла с данным значением
+            temp = temp->next;
+        }
+        if (temp) { // узел найден
+            if (temp->next) {
+                temp->next->prev = temp->prev; // установка указателя на пред.узел
+            }
+            if (temp->prev) {
+                temp->prev->next = temp->next; // установка указателя на след.узел
+            }
+            delete temp; // удаляем узел
+        }
+        else {
+            cout << "Элемент не найден" << endl;
+        }
+    }
+
+    bool LGET_D(int value) {
+        DList* temp = head;
+        while (temp) {
+            if (temp->data == value) {
+                return true;
+            }
+            temp = temp->next;
+        }
+        return false;
+    }
+
+    void PRINT() { // вывод списка
+        DList* temp = head;
+        while (temp){
+            cout << temp->data << ""; // вывод данных узла
+            temp = temp->next; // переход к след.узлу
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    SingleList sList;
+    DoubleList dList;
+    string command;
+
+    while (true){
+        cout << "Введите команду для односвязного списка: " << endl;
+        cout << "LPUSH_FRONT, LPUSH_BACK, LDEL_FRONT, LDEL_BACK, LDEL, LGET, PRINT, EXIT: ";
+        getline(cin, command);
+
+        if (command.substr(0, 11) == "LPUSH_FRONT") {
+            int value;
+            sscanf(command.c_str(), "LPUSH_FRONT %d", &value);
+            sList.LPUSH_FRONT(value);
+        }
+        else if (command.substr(0, 10) == "LPUSH_BACK") {
+            int value;
+            sscanf(command.c_str(), "LPUSH_BACK %d", &value);
+            sList.LPUSH_BACK(value);
+        }
+        else if (command == "LDEL_FRONT") {
+            sList.LDEL_FRONT();
+        }
+        else if (command == "LDEL_BACK") {
+            sList.LDEL_BACK();
+        }
+        else if (command.substr(0, 4) == "LDEL") {
+            int value;
+            sscanf(command.c_str(), "LDEL %d", &value);
+            sList.LDEL(value);
+        }
+        else if (command.substr(0, 4) == "LGET") {
+            int value;
+            sscanf(command.c_str(), "LGET %d", &value);
+            cout << (sList.LGET(value) ? "Элемент найден" : "Элемент не найден") << endl;
+        }
+        else if (command == "PRINT") {
+            sList.PRINT();
+        }
+         else if (command == "EXIT") {
+            break; // прекращение работы программы
+        }
+        else {
+            cout << "Неизвестная команда" << endl;
+        }
+    }
+
+    while (true){
+        cout << "Введите команду для двусвязного списка: " << endl;
+        cout << "LPUSH_DFRONT, LPUSH_DBACK, LDEL_DFRONT, LDEL_DBACK, LDEL_D, LGET_D, PRINT, EXIT: ";
+        getline(cin, command);
+
+        if (command.substr(0, 12) == "LPUSH_DFRONT") {
+            int value;
+            sscanf(command.c_str(), "LPUSH_DFRONT %d", &value);
+            dList.LPUSH_DFRONT(value);
+        }
+        else if (command.substr(0, 11) == "LPUSH_DBACK") {
+            int value;
+            sscanf(command.c_str(), "LPUSH_DBACK %d", &value);
+            dList.LPUSH_DBACK(value);
+        }
+        else if (command == "LDEL_DFRONT") {
+            dList.LDEL_DFRONT();
+        }
+        else if (command == "LDEL_DBACK") {
+            dList.LDEL_DBACK();
+        }
+        else if (command.substr(0, 6) == "LDEL_D") {
+            int value;
+            sscanf(command.c_str(), "LDEL_D %d", &value);
+            dList.LDEL_D(value);
+        }
+        else if (command.substr(0, 6) == "LGET_D") {
+            int value;
+            sscanf(command.c_str(), "LGET_D %d", &value);
+            cout << (dList.LGET_D(value) ? "Элемент найден" : "Элемент не найден") << endl;
+        }
+        else if (command == "PRINT") {
+            dList.PRINT();
+        }
+         else if (command == "EXIT") {
+            break; // прекращение работы программы
+        }
+        else {
+            cout << "Неизвестная команда" << endl;
+        }
+    }
+}
