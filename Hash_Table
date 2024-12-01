@@ -1,0 +1,121 @@
+#include <iostream>
+#include <vector>
+#include <list>
+#include <utility>
+
+using namespace std;
+
+class HashTable {
+    private:
+    static const int TABLE_SIZE = 10;
+    vector<pair<string, int>> table;
+    vector<bool> occupied;
+
+    int hash_func(const string& key) {
+        int hash = 0;
+        for (char ch : key) {
+            hash += ch;
+        }
+        return hash % TABLE_SIZE;
+    }
+
+    public:
+    HashTable(): table(TABLE_SIZE, {"", 0}), occupied(TABLE_SIZE, false) {}
+
+    void HSET(const string& key, int value) {
+        int index = hash_func(key);
+        for (int i = 0; i < TABLE_SIZE; ++i) {
+            int place_index = (index + i) % TABLE_SIZE;
+            if (!occupied[place_index]) {
+                table[place_index] = {key, value};
+                occupied[place_index] = true;
+                cout << "Элемент добавлен" << endl;
+                return;
+            }
+            if (table[place_index].first == key) {
+                cout << "Ключ уже существует. Попробуйте другой" << endl;
+                return;
+            }
+        } 
+        cout << "Хеш-таблица полна. Элемент не добавлен" << endl;
+
+    }
+
+    void HDEL(const string& key) {
+        int index = hash_func(key);
+        for (int i = 0; i < TABLE_SIZE; ++i) {
+            int place_index = (index + i) % TABLE_SIZE;
+            if (!occupied[place_index]) {
+                break;
+            }
+            if (table[place_index].first == key) {
+                occupied[place_index] = false;
+                cout << "Элемент с ключом " << key << " удален" << endl;
+            return;
+            }
+        }
+        cout << "Ключ " << key << " не найден" << endl;
+    }
+
+    void HGET(const string& key) {
+        int index = hash_func(key);
+        for (int i = 0; i < TABLE_SIZE; ++i) {
+            int place_index = (index + i) % TABLE_SIZE;
+            if (!occupied[place_index]) {
+                break;
+            }
+            if (table[place_index].first == key) {
+                cout << "Значение для ключа " << key << ": " << table[place_index].second << endl;
+            return;
+            }
+        }
+        cout << "Ключ " << key << " не найден" << endl;
+    }
+
+    void PRINT() {
+        cout << "Содержимое хеш-таблицы: " << endl;
+        for (int i = 0; i < TABLE_SIZE; ++i) {
+            if (occupied[i]) {
+                cout << "Индекс " << i << ":[" << table[i].first << ": " << table[i].second << "]" << endl;
+            }
+            else {
+                cout << "Индекс " << i << ": пусто" << endl;
+            }
+        }
+    }
+};
+
+int main() {
+    HashTable hash_table;
+    string command;
+    string key;
+    int value;
+
+    while (true) {
+        cout << "Введите команду HSET, HDEL, HGET, PRINT, EXIT: ";
+        getline(cin, command);
+
+        if (command.substr(0, 4) == "HSET") {
+            sscanf(command.c_str(), "HSET %s %d", &key[0], &value);
+            hash_table.HSET(key, value);
+        }
+        else if (command.substr(0, 4) == "HDEL") {
+            sscanf(command.c_str(), "HDEL %s", &key[0]);
+            hash_table.HDEL(key);
+        }
+        else if (command.substr(0, 4) == "HGET") {
+            sscanf(command.c_str(), "HGET %s", &key[0]);
+            hash_table.HGET(key);
+        }
+        else if (command == "PRINT") {
+            hash_table.PRINT();
+        }
+        else if (command == "EXIT") {
+            break;
+        }
+        else {
+            cout << "Неизвестная команда" << endl;
+        }
+    }
+    return 0;
+}
