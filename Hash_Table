@@ -1,85 +1,92 @@
 #include <iostream>
 #include <vector>
-#include <list>
 #include <string>
 
-using namespace std;
+using namespace std; 
 
 class HashTable {
     private:
-    vector<list<pair<string, string>>> table;
-    int size;
-    int now_size;
+    vector<pair<string, string>> table; // хранение пар ключ-значение
+    int size; // размер таблицы
+    int now_size; // текущий размер
 
-    int hash_func(const string& key) {
+    int hash_func(const string& key) { // хеширование для получение индекса на основе ключа
         int hash = 0;
         for (char ch : key) {
-            hash += ch;
+            hash += ch; // суммирует коды символов ключа
         }
-        return hash % size;
+        return hash % size; // возврат индекса в пределах размера таблицы
     }
 
     public:
+    // конструктор таблицы с инициализацией размера и резервом места
     HashTable(int s) : size(s), now_size(0) {
-        table.resize(size);
+        table.resize(size, {"",""}); // заполяем вектор пустыми парами
     }
 
-    void HSET(const string& key, const string& value) {
+    void HSET(const string& key, const string& value) { // добавление элементов
         if (now_size >= size) {
             cout << "Таблица полна. Добавить ключ-значение невозможно" << endl;
             return;
         }
-        int index = hash_func(key);
-        for (const auto& pair : table[index]) {
-            if (pair.first == key) {
-                cout << "Ключ уже существует. Повторите попытку" << endl;
-                return;
-            }
+        int index = hash_func(key); // получаем индекс
+        if (table[index].first == key) {
+            cout << "Ключ уже существует. Повторите попытку" << endl;
+            return;
         }
-        table[index].emplace_back(key, value);
+        while (table[index].first != "") { // поиск первого свободного индекса
+            index = (index + 1) % size;
+        }
+
+        table[index] = {key, value}; // добавление пары ключ-значение
         now_size++;
         cout << "Элемент добавлен" << endl;
         }
 
-    void HDEL(const string& key) {
-        int index = hash_func(key);
-        auto& cell = table[index];
-        for (auto it = cell.begin(); it != cell.end(); ++it){
-            if (it->first == key) {
-                cell.erase(it);
+    void HDEL(const string& key) { // удаление элемента
+        int index = hash_func(key); // получаем индекс
+        for (int i = 0; i < size; ++i) {
+            int now_index = (index + i) % size; // обработка коллизий
+            if (table[now_index].first == key) {
+                table[now_index] = {"",""}; // удаление элемента
                 now_size--;
                 cout << "Элемент удален" << endl;
                 return;
+            }
+            if (table[now_index].first == "") { // встреча пустой клетки
+                break;
             }
         }
         cout << "Ключ не найден. Удаление не возможно" << endl;
     }
 
-    void HGET(const string& key) {
+    void HGET(const string& key) { // получение значения по ключу
         int index = hash_func(key);
-        for (const auto& pair : table[index]) {
-            if (pair.first == key) {
-                cout << "Значение для введенного ключа: " << pair.second << endl;
+        for (int i = 0; i < size; ++i) {
+            int now_index = (index + i) % size; // обработка коллизий
+            if (table[now_index].first == key) {
+                cout << "Значение для введенного ключа: " << table[now_index].second << endl;
                 return;
+            }
+            if (table[now_index].first == "") { // встреча пустой клетки
+                break;
             }
         }
         cout << "Ключ не найден" << endl;
     }
 
-    void PRINT() {
+    void PRINT() { // вывод всей таблицы
         cout << "Содержимое хеш-таблицы: " << endl;
         for (int i = 0; i < size; ++i) {
-            cout << "Индекс " << i << ": ";
-            for (const auto& pair : table[i]) {
-                cout << "{" << pair.first << ":" << pair.second << "}";
+            if (table[i].first != "") {
+                cout << "Индекс " << i << ":{" << table[i].first << ":" << table[i].second << "}" << endl;
             }
-            cout << endl;
         }
     }
 };
 
 int main() {
-    HashTable H(10);
+    HashTable H(10); // таблица размером 10
     string command, key, value;
 
     while (true) {
