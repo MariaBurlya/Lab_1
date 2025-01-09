@@ -1,58 +1,53 @@
-#include <iostream>
-#include <vector>
-#include <string>
+#include "array.h"
 
-using namespace std;
+#include "Array.h"
 
-struct Array {
-    vector<int> M;
-
-    void MPUSH(int index, int value) { // добавление элемента по индексу
-        if (index < 0 || index > M.size()) {
-            cout << "Индекс вне диапазона" << endl;
-            return;
-        }
-        M.insert(M.begin() + index, value); // вставка элемента
+void Array::MPUSH(int index, int value) {
+    if (index < 0 || index > M.size()) {
+        cout << "Индекс вне диапазона" << endl;
+        return;
     }
-    void MPUSH(int value) { // добавление элемента в конец
-        M.push_back(value);
-    }
+    M.insert(M.begin() + index, value);
+}
 
-    int MGET(int index) { // получение элемента по индексу
-        if (index < 0 || index > M.size()) {
-            cout << "Индекс вне диапазона" << endl;
-            return 0;
-        }
-        return M[index];
-    }
+void Array::MPUSH(int value) {
+    M.push_back(value);
+}
 
-    void MDEL(int index) {  // удаление элемента по индексу
-        if (index < 0 || index > M.size()) {
-            cout << "Индекс вне диапазона" << endl;
-            return;
-        }
-        M.erase(M.begin() + index);
+int Array::MGET(int index) {
+    if (index < 0 || index >= M.size()) {
+        cout << "Индекс вне диапазона" << endl;
+        return 0;
     }
+    return M[index];
+}
 
-    void MSET(int index, int value) { // замена элемента по индексу
-        if (index < 0 || index > M.size()) {
-            cout << "Индекс вне диапазона" << endl;
-            return;
-        }
-        M[index] = value;
+void Array::MDEL(int index) {
+    if (index < 0 || index >= M.size()) {
+        cout << "Индекс вне диапазона" << endl;
+        return;
     }
+    M.erase(M.begin() + index);
+}
 
-    int LENGHT() { // длина массива
-        return M.size();
+void Array::MSET(int index, int value) {
+    if (index < 0 || index >= M.size()) {
+        cout << "Индекс вне диапазона" << endl;
+        return;
     }
+    M[index] = value;
+}
 
-    void PRINT() { // вывод массива
-        for (int value : M) {
-            cout << value << " ";
-        }
-        cout << endl;
+int Array::LENGHT() {
+    return M.size();
+}
+
+void Array::PRINT() {
+    for (int value : M) {
+        cout << value << " ";
     }
-};
+    cout << endl;
+}
 
 int main() {
     Array array;
@@ -63,38 +58,30 @@ int main() {
         cout << "Введите команду MPUSH, MGET, MDEL, MSET, PRINT, LENGHT, EXIT: ";
         getline(cin, command);
 
-        if (command.substr(0, 5) == "MPUSH") { // обработка команды
-            if (command.find(' ') == command.rfind(' ')) { // проверка на одно значение
+        if (command.substr(0, 5) == "MPUSH") {
+            if (command.find(' ') == command.rfind(' ')) {
                 sscanf(command.c_str(), "MPUSH %d", &value);
-                array.MPUSH(value); // добавление элемента в конец
-            }
-            else {
+                array.MPUSH(value);
+            } else {
                 sscanf(command.c_str(), "MPUSH %d %d", &index, &value);
-                array.MPUSH(index, value); // добавление элемента по индексу
+                array.MPUSH(index, value);
             }
-        }
-        else if (command.substr(0, 4) == "MGET") { 
+        } else if (command.substr(0, 4) == "MGET") {
             sscanf(command.c_str(), "MGET %d", &index);
-            cout << "Элемент по индексу " << index << ": " << array.MGET(index) << endl; // вывод элемента по индексу
-        }
-        else if (command.substr(0, 4) == "MDEL") {
+            cout << "Элемент по индексу " << index << ": " << array.MGET(index) << endl;
+        } else if (command.substr(0, 4) == "MDEL") {
             sscanf(command.c_str(), "MDEL %d", &index);
-            array.MDEL(index); // удаление элемента по индексу
-        }
-        else if (command.substr(0, 4) == "MSET") {
+            array.MDEL(index);
+        } else if (command.substr(0, 4) == "MSET") {
             sscanf(command.c_str(), "MSET %d %d", &index, &value);
-            array.MSET(index, value); // замена элемента по индексу
-        }
-        else if (command == "PRINT") {
-            array.PRINT(); // вывод массива
-        }
-        else if (command == "LENGHT") {
+            array.MSET(index, value);
+        } else if (command == "PRINT") {
+            array.PRINT();
+        } else if (command == "LENGHT") {
             cout << "Длина массива: " << array.LENGHT() << endl;
-        }
-        else if (command == "EXIT") {
-            break; // прекращение работы программы
-        }
-        else {
+        } else if (command == "EXIT") {
+            break;
+        } else {
             cout << "Неизвестная команда" << endl;
         }
     }
